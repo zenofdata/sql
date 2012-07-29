@@ -66,6 +66,7 @@ def get_nodc_filelist(url_base):
     f = urllib.urlopen(url_base)
     text = f.read()
     f.close()
+    #import pdb; pdb.set_trace()
     tarfiles = re.findall(r"<a href=\"(.*)\">argo_\S{2}\d+\.tgz</a>", text)
     return tarfiles
 
@@ -114,23 +115,43 @@ class Load_nodc(object):
         self.set_db_conn()
 
         self.tarfiles = get_nodc_filelist(self.cfg['url_base'])
-        self.filter_tarfiles()
 
+	import pdb; pdb.set_trace()
+        self.filter_tarfiles()
+        # Temporary solution to reduce loads for testing purposes.
+        from numpy.random import permutation
+        #import pdb; pdb.set_trace()
+        self.tarfiles = (numpy.array(self.tarfiles)[permutation(len(self.tarfiles))[:2]]).tolist()
+        #self.tarfiles = self.tarfiles[:50]
+
+        print "I'll do the files %s" % self.tarfiles
         for tgzf in self.tarfiles:
             dtmp = download_nodc_file(tgzf)
             argo_files = extract_targz(dtmp, tgzf)
 
             results = []
+            tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-4]
             for argo_nc in argo_files:
                 results.append(self.insert_nc(argo_nc))
 
-            print "Results: ", results
-
-            curs.execute("SELECT argo.cleanargorealtime()")
-            conn.commit()
+            #print "Results: ", results
+            if numpy.array(results).all():
+                print "All files from %s worked fine" % tgzf
+                query="INSERT INTO %s(basename, db_insertion) \
+                        VALUES('%s','%s') RETURNING %s.id" % \
+                        (self.argo_files_table, tgzf, tnow, 
+                        self.argo_files_table)
+                curs = self.conn.cursor()
+                curs.execute(query)
+                self.conn.commit()
 
             shutil.rmtree(dtmp)
             print "Deleted: %s" % dtmp
+
+            #curs.execute("SELECT argo.cleanargorealtime()")
+            self.conn.commit()
+
+            import time; time.sleep(10)
 
 
     def set_defaults(self):
@@ -148,8 +169,8 @@ class Load_nodc(object):
     def set_db_conn(self):
         """
         """
-        dsn='dbname=%s user=%s host=%s' % \
-                (self.cfg['dbname'], self.cfg['dbuser'], self.cfg['dbhost'])
+        dsn='dbname=%s user=%s host=%s password=%s' % \
+                (self.cfg['dbname'], self.cfg['dbuser'], self.cfg['dbhost'], self.cfg['dbpassword'],)
         self.conn = psycopg2.connect(dsn)
 
     def filter_tarfiles(self):
@@ -286,8 +307,9 @@ def dap_argo_urls_coriolis(dia=None,maxdt=None,ini_date=None,fin_date=None):
 
 
 
-cfg={'dbname':'gmaoa_test', \
+cfg={'dbname':'zen_test', \
         'dbuser' : 'elbonian', \
+        'dbpassword' : 'minhoca', \
         'dbhost' : 'localhost'
         }
 
