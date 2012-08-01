@@ -1,9 +1,10 @@
-/*
-CREATE OR REPLACE VIEW ctd.profiles AS
+CREATE OR REPLACE VIEW ctd.station AS
     SELECT c.id as cruiseid, c.shiplnk, c.name as cruisename, 
-        p.id as profileid, datetime, latitude, longitude, location, position_qc, time, woce_time, cast_number, station_number, woce_version, woce_id, woce_ctd_flag_desc 
-        FROM ctd.cruise as c INNER JOIN ctd.profile as p ON (c.id = p.cruiselnk);
-*/
+        p.id as profileid, datetime, date(datetime) as woce_date, 
+	"time"(datetime) as woce_time, latitude, longitude, location, 
+	position_qc, cast_number, station_number, woce_version, woce_id, woce_ctd_flag_desc
+	FROM pirata_raw.cruise as c INNER JOIN pirata_raw.profile as p ON (c.id = p.cruiselnk);
+
 
 CREATE OR REPLACE VIEW ctd.data_qc AS
     SELECT 
