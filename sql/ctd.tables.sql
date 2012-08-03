@@ -81,6 +81,7 @@ CREATE TABLE ctd.profile_flags (
     id                  INTEGER NOT NULL,
     possible_datetime   BOOLEAN,
     possible_location   BOOLEAN,
+    at_sea              BOOLEAN,
     FOREIGN KEY (id)
         REFERENCES ctd.profile (id)
         ON UPDATE CASCADE
