@@ -3,7 +3,7 @@ CREATE OR REPLACE VIEW ctd.station AS
         p.id as profileid, datetime, date(datetime) as woce_date, 
 	"time"(datetime) as woce_time, latitude, longitude, location, 
 	position_qc, cast_number, station_number, woce_version, woce_id, woce_ctd_flag_desc
-	FROM pirata_raw.cruise as c INNER JOIN pirata_raw.profile as p ON (c.id = p.cruiselnk);
+	FROM ctd.cruise as c INNER JOIN ctd.profile as p ON (c.id = p.cruiselnk);
 
 
 CREATE OR REPLACE VIEW ctd.data_qc AS
