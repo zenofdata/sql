@@ -39,11 +39,17 @@ CREATE ROLE castelao WITH
 
 
 # ==== Grupos =========================================
+CREATE ROLE pgis_users NOINHERIT;
+
 CREATE ROLE argousers NOINHERIT;
 CREATE ROLE ctdusers NOINHERIT;
 CREATE ROLE tsgusers NOINHERIT;
 CREATE ROLE xbtusers NOINHERIT;
 
+
+GRANT pgis_users TO alice;
+GRANT pgis_users TO asok;
+GRANT pgis_users TO elbonian;
 
 GRANT ctdusers TO alice;
 GRANT ctdusers TO asok;

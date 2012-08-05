@@ -25,6 +25,9 @@ psql -d template_postgis -f /usr/share/postgresql/8.4/contrib/postgis-2.0/raster
 psql -d template_postgis -f /usr/share/postgresql/8.4/contrib/postgis-2.0/topology.sql
 psql -d template_postgis -f /usr/share/postgresql/8.4/contrib/postgis-2.0/topology_comments.sql
 
+GRANT SELECT ON spatial_ref_sys, geometry_columns TO GROUP pgis_users;
+
+
 # Old stuff, maybe still pertinent.
 # Check about the permissions to run GIS functions on
 # http://www.paolocorti.net/2008/01/30/installing-postgis-on-ubuntu/
