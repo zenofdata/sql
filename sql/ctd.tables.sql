@@ -21,13 +21,18 @@ CREATE TABLE ctd.profile(
     id			    SERIAL,
     filelnk	    	INTEGER,
     cruiselnk		INTEGER,
-    woce_time       VARCHAR(30),   -- WOCE time of day, (hhmmss.dd UTC), not sure what is it!?!
-    woce_date       VARCHAR(30),   -- WOCE date, (yyyymmdd UTC),
+    /* Don't make sense date+time and datetime columns
+       WOCE has it's own format, probably it should come from a view
+       What would be more efficient? datetime or date + time?
+       Should I consider the possible case of have date or time only?
+    */
+    --woce_time       VARCHAR(30),   -- WOCE time of day, (hhmmss.dd UTC), not sure what is it!?!
+    --woce_date       VARCHAR(30),   -- WOCE date, (yyyymmdd UTC),
     --tempo           TIME,
     --data            DATE,
     datetime        TIMESTAMP(0), -- WITH TIME ZONE,
-    latitude        VARCHAR(50),
-    longitude       VARCHAR(50),
+    --latitude        VARCHAR(50),
+    --longitude       VARCHAR(50),
     location		GEOGRAPHY(POINT,4326), -- Not sure if make sense have it here
     position_qc         SMALLINT,
     --name            VARCHAR(50),
