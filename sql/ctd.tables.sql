@@ -97,7 +97,8 @@ CREATE TABLE ctd.profile_flags (
 
 CREATE TABLE ctd.data_flags (
     id                  INTEGER NOT NULL,
-    NeuralNetwork	SMALLINT
+    ML_T		SMALLINT, -- Machine Learn evaluation for T
+    ML_S		SMALLINT, -- Machine Learn evaluation for S
     global_rangeT       BOOLEAN,
     global_rangeS       BOOLEAN,
     not_spikeT          BOOLEAN,
