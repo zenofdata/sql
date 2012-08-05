@@ -44,6 +44,7 @@ CREATE TABLE ctd.profile(
     conventions     VARCHAR(50),
     woce_id         VARCHAR(50),
     woce_ctd_flag_desc  VARCHAR(150),
+    notes           VARCHAR(500), -- Notes section from the .cnv's header
     PRIMARY KEY(id),
     --UNIQUE(filelnk,platform,datetime,data_mode),
     FOREIGN KEY (filelnk)
