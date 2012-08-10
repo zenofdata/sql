@@ -17,7 +17,7 @@ CREATE TABLE ctd.cruise(
     );
 
 
-CREATE TABLE ctd.profile(
+CREATE TABLE ctd.station(
     id			    SERIAL,
     filelnk	    	INTEGER,
     cruiselnk		INTEGER,
@@ -55,7 +55,7 @@ CREATE TABLE ctd.profile(
 
 CREATE TABLE ctd.data(
     id          SERIAL,
-    profilelnk  INTEGER NOT NULL,
+    stationlnk  INTEGER NOT NULL,
     timeS       REAL,       --Time Elapsed [seconds]
     timeS_qc       SMALLINT,    --woce_flags
     depth		REAL,
@@ -76,20 +76,20 @@ CREATE TABLE ctd.data(
     potemperature_qc      SMALLINT,
     -- Should I include density?!
     PRIMARY KEY(id),
-    FOREIGN KEY (profilelnk)
-      REFERENCES ctd.profile (id)
+    FOREIGN KEY (stationlnk)
+      REFERENCES ctd.station (id)
       ON UPDATE CASCADE
       ON DELETE CASCADE
     );
 
 
-CREATE TABLE ctd.profile_flags (
+CREATE TABLE ctd.station_flags (
     id                  INTEGER NOT NULL,
     possible_datetime   BOOLEAN,
     possible_location   BOOLEAN,
     at_sea              BOOLEAN,
     FOREIGN KEY (id)
-        REFERENCES ctd.profile (id)
+        REFERENCES ctd.station (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     UNIQUE (id)
@@ -97,24 +97,37 @@ CREATE TABLE ctd.profile_flags (
 
 CREATE TABLE ctd.data_flags (
     id                  INTEGER NOT NULL,
-    ML_T		SMALLINT, -- Machine Learn evaluation for T
-    ML_S		SMALLINT, -- Machine Learn evaluation for S
-    global_rangeT       BOOLEAN,
-    global_rangeS       BOOLEAN,
-    not_spikeT          BOOLEAN,
-    not_spikeS          BOOLEAN,
-    not_gradientT       BOOLEAN,
-    not_gradientS       BOOLEAN,
-    digitrollT		BOOLEAN,
-    digitrollS		BOOLEAN,
-    climatologyt	BOOLEAN,
-    climatologys	BOOLEAN,
+    measure		VARCHAR(3),	-- [T, S, T2, O, C]
+    ML			SMALLINT, -- Machine Learn evaluation
+    --ML_T		SMALLINT, -- Machine Learn evaluation for T
+    --ML_S		SMALLINT, -- Machine Learn evaluation for S
+    global_range	BOOLEAN,
+    --global_rangeT       BOOLEAN,
+    --global_rangeS       BOOLEAN,
+    not_spike		BOOLEAN,
+    --not_spikeT          BOOLEAN,
+    --not_spikeS          BOOLEAN,
+    not_gradient	BOOLEAN,
+    --not_gradientT       BOOLEAN,
+    --not_gradientS       BOOLEAN,
+    digitroll		BOOLEAN,
+    --digitrollT		BOOLEAN,
+    --digitrollS		BOOLEAN,
+    climatology		BOOLEAN,
+    --climatologyt	BOOLEAN,
+    --climatologys	BOOLEAN,
     FOREIGN KEY (id)
         REFERENCES ctd.data (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    UNIQUE (id)
+    UNIQUE (id, measure)/*,
+    CONSTRAINT measure CHECK
+        (measure ='t' OR measure = 't2'
+          OR measure = 's' OR measure = 's2'
+          OR measure = 'c' OR measure = 'c2'
+          OR measure = 'o' OR measure = 'o2')*/
     );
+-- CREATE TYPE element_type AS ENUM ('t', 's');
 
 /*
 CREATE TABLE pirata.loaded_files(
@@ -139,7 +152,7 @@ CREATE TABLE pirata.cruise(
     );
 
 
-CREATE TABLE pirata.profile(
+CREATE TABLE pirata.station(
     id			SERIAL,
     --filelnk		INTEGER,
     cruiselnk		INTEGER,
@@ -159,7 +172,7 @@ CREATE TABLE pirata.profile(
 
 CREATE TABLE pirata.data(
     id          SERIAL,
-    profilelnk  INTEGER,
+    stationlnk  INTEGER,
     depth		REAL,
     pressure            REAL,
     --pressure_qc         SMALLINT,
@@ -181,19 +194,19 @@ CREATE TABLE pirata.data(
     --salinity_adjusted_qc        SMALLINT,
     --salinity_adjusted_error     REAL,
     PRIMARY KEY(id),
-    FOREIGN KEY (profilelnk)
-      REFERENCES ctd.profile (id)
+    FOREIGN KEY (stationlnk)
+      REFERENCES ctd.station (id)
       ON UPDATE CASCADE
       ON DELETE CASCADE
     );
 
 
-CREATE TABLE pirata.profile_flags (
+CREATE TABLE pirata.station_flags (
     id                  INTEGER,
     possible_datetime   BOOLEAN,
     possible_location   BOOLEAN,
     FOREIGN KEY (id)
-        REFERENCES pirata.profile (id)
+        REFERENCES pirata.station (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     UNIQUE (id)
@@ -219,20 +232,20 @@ CREATE TABLE pirata.data_flags (
 GRANT USAGE ON SCHEMA ctd TO ctdusers;
 GRANT SELECT ON ctd.loaded_file TO ctdusers;
 GRANT SELECT ON ctd.cruise TO ctdusers;
-GRANT SELECT ON ctd.profile TO ctdusers;
+GRANT SELECT ON ctd.station TO ctdusers;
 GRANT SELECT ON ctd.data TO ctdusers;
-GRANT SELECT ON ctd.profile_flags TO ctdusers;
+GRANT SELECT ON ctd.station_flags TO ctdusers;
 GRANT SELECT ON ctd.data_flags TO ctdusers;
 
 GRANT INSERT, UPDATE, DELETE ON ctd.loaded_file TO alice;
 -- GRANT INSERT, UPDATE         ON ctd.loaded_file_id_seq TO alice;
 GRANT INSERT, UPDATE, DELETE ON ctd.cruise TO alice;
 -- GRANT INSERT, UPDATE         ON ctd.cruise_id_seq TO alice;
-GRANT INSERT, UPDATE, DELETE ON ctd.profile TO alice;
--- GRANT INSERT, UPDATE         ON ctd.profile_id_seq TO alice;
+GRANT INSERT, UPDATE, DELETE ON ctd.station TO alice;
+-- GRANT INSERT, UPDATE         ON ctd.station_id_seq TO alice;
 GRANT INSERT, UPDATE, DELETE ON ctd.data TO alice;
 -- GRANT INSERT, UPDATE         ON ctd.data_id_seq TO alice;
-GRANT INSERT, UPDATE, DELETE ON ctd.profile_flags TO alice;
+GRANT INSERT, UPDATE, DELETE ON ctd.station_flags TO alice;
 GRANT INSERT, UPDATE, DELETE ON ctd.data_flags TO alice;
 
 -- pirata.* not included
