@@ -54,3 +54,7 @@ GRANT pgis_users TO elbonian;
 GRANT ctdusers TO alice;
 GRANT ctdusers TO asok;
 GRANT ctdusers TO elbonian;
+
+GRANT argousers TO alice;
+GRANT argousers TO asok;
+GRANT argousers TO elbonian;
