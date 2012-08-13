@@ -38,7 +38,7 @@ CREATE TABLE argo.profile(
       ON DELETE CASCADE
     );
 
-CREATE INDEX profile_data_mode_index ON argo.profile(data_mode);
+--CREATE INDEX profile_data_mode_index ON argo.profile(data_mode);
 CREATE INDEX profile_platform_index ON argo.profile(platform);
 CREATE INDEX profile_datetime_index ON argo.profile(datetime);
 CREATE INDEX profile_cycle_index ON argo.profile(cycle);
@@ -161,6 +161,13 @@ AFTER INSERT ON argo.levels
 5 Value changed
 8 Interpolated
 */
+
+CREATE OR REPLACE VIEW argo.profile_last30days AS
+    SELECT id, extract(epoch from datetime) as t, datetime, 
+        ST_Y(location::geometry) as latitude, 
+	ST_X(location::geometry) as longitude
+	FROM argo.profile WHERE datetime > (now()-interval '1 months') 
+        ORDER BY id;
 
 -- ARGO profiles with valid position and datetime.
 CREATE OR REPLACE VIEW argo.profile_good AS
