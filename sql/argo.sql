@@ -41,7 +41,7 @@ CREATE TABLE argo.profile(
 --CREATE INDEX profile_data_mode_index ON argo.profile(data_mode);
 CREATE INDEX profile_platform_index ON argo.profile(platform);
 CREATE INDEX profile_datetime_index ON argo.profile(datetime);
-CREATE INDEX profile_cycle_index ON argo.profile(cycle);
+-- CREATE INDEX profile_cycle_index ON argo.profile(cycle);
 CREATE INDEX profile_location    ON argo.profile USING GIST(location); 
 
 
@@ -77,8 +77,8 @@ CREATE TABLE argo.profile_analysis(
 */
 
 CREATE TABLE argo.levels(
-    id		SERIAL,
-    profilelnk	INTEGER,
+    id			SERIAL,
+    profilelnk		INTEGER,
     pressure		REAL,
     pressure_qc		SMALLINT,
     pressure_adjusted	REAL,
@@ -102,9 +102,28 @@ CREATE TABLE argo.levels(
     );
 
 
+CREATE INDEX levels_profile_index ON argo.levels(profilelnk);
 CREATE INDEX levels_pressure_index ON argo.levels(pressure);
 CREATE INDEX levels_temperature_index ON argo.levels(temperature);
 CREATE INDEX levels_salinity_index ON argo.levels(salinity);
+
+CREATE TABLE argo.levels_30days(
+    id                  SERIAL,
+    profilelnk          INTEGER,
+    pressure            REAL,
+    temperature         REAL,
+    salinity            REAL,
+    PRIMARY KEY(id),
+    FOREIGN KEY (profilelnk)
+      REFERENCES argo.profile (id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+    );
+
+CREATE INDEX levels_30days_profile_index ON argo.levels_30days(profilelnk);
+CREATE INDEX levels_30days_pressure_index ON argo.levels_30days(pressure);
+CREATE INDEX levels_30days_temperature_index ON argo.levels_30days(temperature);
+CREATE INDEX levels_30days_salinity_index ON argo.levels_30days(salinity);
 
 CREATE TABLE argo.levels_flags(
     id                  INTEGER,
@@ -168,6 +187,21 @@ CREATE OR REPLACE VIEW argo.profile_last30days AS
 	ST_X(location::geometry) as longitude
 	FROM argo.profile WHERE datetime > (now()-interval '1 months') 
         ORDER BY id;
+
+
+
+CREATE OR REPLACE VIEW argo.data_last30days AS
+    SELECT l.id, l.profilelnk, p.datetime, 
+        ST_Y(location::geometry) as latitude, 
+	ST_X(location::geometry) as longitude,
+	l.pressure, l.temperature, l.salinity
+        FROM argo.profile AS p
+	    -- JOIN argo.levels AS l
+	    JOIN argo.levels_30days AS l
+	    ON (p.id = l.profilelnk)
+	WHERE p.datetime > (now()-interval '1 months')
+	ORDER by p.datetime;
+
 
 -- ARGO profiles with valid position and datetime.
 CREATE OR REPLACE VIEW argo.profile_good AS
@@ -287,3 +321,28 @@ CREATE OR REPLACE FUNCTION argo.cleanargo() RETURNS text AS $$
 	RETURN NULL;
     END;
     $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION argo.update_30levels() RETURNS text AS $$
+    BEGIN
+	DELETE FROM argo.levels_30days
+	    WHERE profilelnk IN
+	        (SELECT id FROM argo.profile
+                    WHERE datetime < (now()-interval '1 months'));
+        INSERT INTO argo.levels_30days 
+            (id, profilelnk, pressure, temperature, salinity) 
+            (SELECT id, profilelnk, pressure, temperature, salinity 
+	        FROM argo.levels 
+                WHERE profilelnk IN 
+                    (SELECT id 
+	                FROM argo.profile 
+	                WHERE datetime >= (now()-interval '1 months'))
+                    AND id NOT IN (SELECT id FROM argo.levels_30days)
+            );
+	ANALYZE argo.levels_30days;
+	REINDEX TABLE argo.levels_30days;
+	RETURN NULL;
+    END;
+    $$ LANGUAGE plpgsql;
+
+
