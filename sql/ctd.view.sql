@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW ctd.station AS
     SELECT c.id as cruiseid, c.shiplnk, c.name as cruisename, 
-        p.id as profileid, datetime, date(datetime) as woce_date, 
-	"time"(datetime) as woce_time, latitude, longitude, location, 
+        p.id as profileid, datetime, /*date(datetime) as woce_date, 
+	"time"(datetime) as woce_time, latitude, longitude,*/ location, 
 	position_qc, cast_number, station_number, woce_version, woce_id, woce_ctd_flag_desc
 	FROM ctd.cruise as c INNER JOIN ctd.profile as p ON (c.id = p.cruiselnk);
 
@@ -11,14 +11,14 @@ CREATE OR REPLACE VIEW ctd.data_qc AS
         df.id, df.profilelnk, df.timeS, df.depth, df.pressure, df.temperature, df.conductivity, df.salinity, df.potemperature,
         df.global_rangeT, df.global_rangeS, df.not_spikeT, df.not_spikeS, df.not_gradientT, df.not_gradientS,
         pf.possible_datetime, pf.possible_location
-      FROM ctd.profile_flags AS pf RIGHT JOIN 
+      FROM ctd.station_flags AS pf RIGHT JOIN 
       (SELECT 
-        d.id, d.profilelnk, d.timeS, d.depth, d.pressure, d.temperature, d.conductivity, d.salinity, d.potemperature,
+        d.id, d.stationlnk, d.timeS, d.depth, d.pressure, d.temperature, d.conductivity, d.salinity, d.potemperature,
         f.global_rangeT, f.global_rangeS, f.not_spikeT, f.not_spikeS,
         f.not_gradientT, f.not_gradientS, f.climatologyT, f.climatologyS
           FROM ctd.data as d LEFT JOIN ctd.data_flags as f 
           ON (d.id = f.id)) AS df
-    ON (pf.id = df.profilelnk);
+    ON (pf.id = df.stationlnk);
 
 
 CREATE OR REPLACE VIEW ctd.cruises_data_qc AS
