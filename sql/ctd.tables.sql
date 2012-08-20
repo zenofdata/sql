@@ -110,7 +110,7 @@ CREATE TABLE ctd.data_flags (
     not_gradient	BOOLEAN,
     --not_gradientT       BOOLEAN,
     --not_gradientS       BOOLEAN,
-    digitroll		BOOLEAN,
+    not_digitroll	BOOLEAN,
     --digitrollT		BOOLEAN,
     --digitrollS		BOOLEAN,
     climatology		BOOLEAN,
@@ -247,6 +247,27 @@ GRANT INSERT, UPDATE, DELETE ON ctd.data TO alice;
 -- GRANT INSERT, UPDATE         ON ctd.data_id_seq TO alice;
 GRANT INSERT, UPDATE, DELETE ON ctd.station_flags TO alice;
 GRANT INSERT, UPDATE, DELETE ON ctd.data_flags TO alice;
+
+-- pirata.* not included
+
+GRANT USAGE ON SCHEMA pirata_raw TO ctdusers;
+GRANT SELECT ON pirata_raw.loaded_file TO ctdusers;
+GRANT SELECT ON pirata_raw.cruise TO ctdusers;
+GRANT SELECT ON pirata_raw.station TO ctdusers;
+GRANT SELECT ON pirata_raw.data TO ctdusers;
+GRANT SELECT ON pirata_raw.station_flags TO ctdusers;
+GRANT SELECT ON pirata_raw.data_flags TO ctdusers;
+
+GRANT INSERT, UPDATE, DELETE ON pirata_raw.loaded_file TO alice;
+-- GRANT INSERT, UPDATE         ON pirata_raw.loaded_file_id_seq TO alice;
+GRANT INSERT, UPDATE, DELETE ON pirata_raw.cruise TO alice;
+-- GRANT INSERT, UPDATE         ON pirata_raw.cruise_id_seq TO alice;
+GRANT INSERT, UPDATE, DELETE ON pirata_raw.station TO alice;
+-- GRANT INSERT, UPDATE         ON pirata_raw.station_id_seq TO alice;
+GRANT INSERT, UPDATE, DELETE ON pirata_raw.data TO alice;
+-- GRANT INSERT, UPDATE         ON pirata_raw.data_id_seq TO alice;
+GRANT INSERT, UPDATE, DELETE ON pirata_raw.station_flags TO alice;
+GRANT INSERT, UPDATE, DELETE ON pirata_raw.data_flags TO alice;
 
 -- pirata.* not included
 
