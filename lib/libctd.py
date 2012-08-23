@@ -13,22 +13,18 @@ import glob
 import numpy as np
 from numpy import ma
 import psycopg2
+import yaml
 
 from cnv import cnv
 
 import pdb
 
-cfg = {
-    'data_path': "/Users/castelao/work/inpe/PIRATA/Dados CTD/Split",
-    'data_file_pattern': "dPIRA*.cnv",
-    'defaults_file': '/Users/castelao/work/projects/python/pycnv/test_data/pirata13_defaults.yaml',
-    'sql':{
-        'user':'alice',
-        'password': 'twiceonsundays',
-        'dbname':'zen',
-        'host':'192.168.1.40',
-        }
-    }
+f = open('config.yaml')
+cfg_text = f.read()
+f.close()
+
+cfg = yaml.load(cfg_text)
+print cfg
 
 cnv_filenames = glob.glob(os.path.join(cfg['data_path'], cfg['data_file_pattern']))
 
@@ -106,9 +102,6 @@ for cnv_filename in cnv_filenames:
             #curs.execute (query, (profileid, (time[i]), (depth[i]),(press[i]), (temp[i]), (sal[i]),) )  
             curs.execute (query, (profileid, (time[i]), (press[i]), (temp[i]), (sal[i]),) )  
         
-        
         print "Inserted %d records into pirata_raw.data" % num
         
-        
         conn.commit()
-
