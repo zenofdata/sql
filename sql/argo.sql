@@ -19,6 +19,7 @@ CREATE TABLE argo.files(
 ALTER TABLE argo.files OWNER TO pointyhaired;
 GRANT SELECT ON argo.files TO argousers;
 GRANT INSERT, UPDATE, DELETE ON argo.files TO alice;
+GRANT UPDATE ON SEQUENCE argo.files_id_seq TO alice;
 
 # ============================================================================
 
@@ -58,6 +59,7 @@ CREATE INDEX profile_location    ON argo.profile USING GIST(location);
 ALTER TABLE argo.profile OWNER TO pointyhaired;
 GRANT SELECT ON argo.profile TO argousers;
 GRANT INSERT, UPDATE, DELETE ON argo.profile TO alice;
+GRANT UPDATE ON SEQUENCE argo.profile_id_seq TO alice;
 
 
 /*
