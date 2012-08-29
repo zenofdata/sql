@@ -7,6 +7,11 @@ apt-get -s install postgresql postgresql-9.1-postgis  pgtune
 apt-get -s install python-psycopg2 python-numpy python-pip
 sudo pip install pupynere
 
+sudo su postgres
+psql -d template_postgis -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+psql -d template_postgis -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+psql -d template_postgis -f /usr/share/postgresql/9.1/contrib/postgis_comments.sql
+
 # ===================================================================
 # To install psql 9.1 into squeezy
 apt-get  -t squeeze-backports install postgresql-plpython-9.1 postgresql-contrib-9.1
@@ -25,7 +30,10 @@ psql -d template_postgis -f /usr/share/postgresql/8.4/contrib/postgis-2.0/raster
 psql -d template_postgis -f /usr/share/postgresql/8.4/contrib/postgis-2.0/topology.sql
 psql -d template_postgis -f /usr/share/postgresql/8.4/contrib/postgis-2.0/topology_comments.sql
 
+# ===================================================================
+
 GRANT SELECT ON spatial_ref_sys, geometry_columns TO GROUP pgis_users;
+
 
 
 # Old stuff, maybe still pertinent.
@@ -38,7 +46,7 @@ listen_addresses = 'localhost, 10.209.107.242'
 
 sudo pgtune --type DW  -i  /etc/postgresql/9.1/main/postgresql.conf  -o  /etc/postgresql/9.1/main/postgresql.conf.pgtune
 
-sudo vim sysctl.d/30-postgresql-shm.conf
+sudo vim /etc/sysctl.d/30-postgresql-shm.conf
 kernel.shmmax = 190500000
 
 # ===================================================================
@@ -82,7 +90,7 @@ hostssl zen_test        asok            10.112.221.203/32       md5
 # ========================
 
 CREATE DATABASE	zen WITH OWNER pointyhaired TEMPLATE template_postgis ENCODING 'UTF8';
-CREATE DATABASE	zen_test WITH OWNER elbonian TEMPLATE template_postgis ENCODING 'UTF8';
+CREATE DATABASE	zen_test WITH OWNER pointyhaired TEMPLATE template_postgis ENCODING 'UTF8';
 
 
 #createlang -U pointyhaired plpythonu zen_test
