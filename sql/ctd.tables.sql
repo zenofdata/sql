@@ -1,4 +1,5 @@
 CREATE SCHEMA ctd AUTHORIZATION pointyhaired;
+GRANT USAGE ON SCHEMA ctd TO ctdusers;
 
 CREATE TABLE ctd.loaded_file(
     id                  SERIAL,
@@ -9,16 +10,26 @@ CREATE TABLE ctd.loaded_file(
     PRIMARY KEY(id)
     );
 
+ALTER TABLE ctd.loaded_file OWNER TO pointyhaired;
+GRANT SELECT ON ctd.loaded_file TO ctdusers;
+GRANT INSERT, UPDATE, DELETE ON ctd.loaded_file TO alice;
+GRANT UPDATE ON SEQUENCE ctd.loaded_file_id_seq TO alice;
+
 
 CREATE TABLE ctd.cruise(
     id		SERIAL,
     shiplnk	INTEGER,
-    name	VARCHAR
+    name	VARCHAR,
+    PRIMARY KEY(id)
     );
 
+ALTER TABLE ctd.cruise OWNER TO pointyhaired;
+GRANT SELECT ON ctd.cruise TO ctdusers;
+GRANT INSERT, UPDATE, DELETE ON ctd.cruise TO alice;
+GRANT UPDATE ON SEQUENCE ctd.cruise_id_seq TO alice;
 
 CREATE TABLE ctd.station(
-    id			    SERIAL,
+    id			SERIAL,
     filelnk	    	INTEGER,
     cruiselnk		INTEGER,
     /* Don't make sense date+time and datetime columns
@@ -30,14 +41,14 @@ CREATE TABLE ctd.station(
     --woce_date       VARCHAR(30),   -- WOCE date, (yyyymmdd UTC),
     --tempo           TIME,
     --data            DATE,
-    datetime        TIMESTAMP(0), -- WITH TIME ZONE,
+    datetime		TIMESTAMP(0), -- WITH TIME ZONE,
     --latitude        VARCHAR(50),
     --longitude       VARCHAR(50),
     location		GEOGRAPHY(POINT,4326), -- Not sure if make sense have it here
     position_qc         SMALLINT,
     --name            VARCHAR(50),
     -- cast , ?!?!
-    cast_number     VARCHAR,
+    cast_number		VARCHAR,
     station_number  VARCHAR,
     woce_version    VARCHAR(25),
     --shipname        VARCHAR(50),
@@ -50,14 +61,24 @@ CREATE TABLE ctd.station(
     FOREIGN KEY (filelnk)
       REFERENCES ctd.loaded_file (id)
       ON UPDATE CASCADE
+      ON DELETE CASCADE,
+    FOREIGN KEY (cruiselnk)
+      REFERENCES ctd.cruise (id)
+      ON UPDATE CASCADE
       ON DELETE CASCADE
     );
 
+ALTER TABLE ctd.station OWNER TO pointyhaired;
+GRANT SELECT ON ctd.station TO ctdusers;
+GRANT INSERT, UPDATE, DELETE ON ctd.station TO alice;
+GRANT UPDATE ON SEQUENCE ctd.station_id_seq TO alice;
+
+
 CREATE TABLE ctd.data(
-    id          SERIAL,
-    stationlnk  INTEGER NOT NULL,
-    timeS       REAL,       --Time Elapsed [seconds]
-    timeS_qc       SMALLINT,    --woce_flags
+    id			SERIAL,
+    stationlnk		INTEGER NOT NULL,
+    timeS		REAL,       --Time Elapsed [seconds]
+    timeS_qc		SMALLINT,    --woce_flags
     depth		REAL,
     pressure            REAL,
     pressure_qc         SMALLINT,
@@ -81,6 +102,12 @@ CREATE TABLE ctd.data(
       ON UPDATE CASCADE
       ON DELETE CASCADE
     );
+
+ALTER TABLE ctd.data OWNER TO pointyhaired;
+GRANT SELECT ON ctd.data TO ctdusers;
+GRANT INSERT, UPDATE, DELETE ON ctd.data TO alice;
+GRANT UPDATE ON SEQUENCE ctd.data_id_seq TO alice;
+
 
 
 CREATE TABLE ctd.station_flags (
