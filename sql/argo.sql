@@ -207,6 +207,8 @@ CREATE OR REPLACE VIEW argo.profile_last30days AS
 	FROM argo.profile WHERE datetime > (now()-interval '1 months') 
         ORDER BY id;
 
+ALTER VIEW argo.profile_last30days OWNER TO pointyhaired;
+GRANT SELECT ON argo.profile_last30days TO argousers;
 
 
 CREATE OR REPLACE VIEW argo.data_last30days AS
