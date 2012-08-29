@@ -1,3 +1,6 @@
+CREATE SCHEMA argo AUTHORIZATION pointyhaired;
+GRANT USAGE ON SCHEMA argo TO argousers;
+
 CREATE LANGUAGE plpgsql;
 
 
@@ -7,9 +10,17 @@ CREATE TABLE argo.files(
     date_creation	TIMESTAMP(0),
     date_update		TIMESTAMP(0),
     db_insertion	TIMESTAMP(2) NOT NULL DEFAULT NOW(),
+    -- file_time           TIMESTAMP(2),
+    file_hash           CHAR(33),
     PRIMARY KEY(id)/*,
     UNIQUE(basename)*/
     );
+
+ALTER TABLE argo.files OWNER TO pointyhaired;
+GRANT SELECT ON argo.files TO argousers;
+GRANT INSERT, UPDATE, DELETE ON argo.files TO alice;
+
+# ============================================================================
 
 CREATE TABLE argo.profile(
     id		SERIAL,
@@ -44,6 +55,9 @@ CREATE INDEX profile_datetime_index ON argo.profile(datetime);
 -- CREATE INDEX profile_cycle_index ON argo.profile(cycle);
 CREATE INDEX profile_location    ON argo.profile USING GIST(location); 
 
+ALTER TABLE argo.profile OWNER TO pointyhaired;
+GRANT SELECT ON argo.profile TO argousers;
+GRANT INSERT, UPDATE, DELETE ON argo.profile TO alice;
 
 
 /*
@@ -107,6 +121,13 @@ CREATE INDEX levels_pressure_index ON argo.levels(pressure);
 CREATE INDEX levels_temperature_index ON argo.levels(temperature);
 CREATE INDEX levels_salinity_index ON argo.levels(salinity);
 
+ALTER TABLE argo.levels OWNER TO pointyhaired;
+GRANT SELECT ON argo.levels TO argousers;
+GRANT INSERT, UPDATE, DELETE ON argo.levels TO alice;
+
+# ============================================================================
+
+
 CREATE TABLE argo.levels_30days(
     id                  SERIAL,
     profilelnk          INTEGER,
@@ -142,10 +163,6 @@ CREATE TABLE argo.levels_flags(
 
 
 
-GRANT USAGE ON SCHEMA argo TO argousers;
-GRANT SELECT ON argo.files TO argousers;
-GRANT SELECT ON argo.profile TO argousers;
-GRANT SELECT ON argo.levels TO argousers;
 GRANT SELECT ON argo.profile_good TO argousers;
 # ================
 
