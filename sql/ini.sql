@@ -8,6 +8,8 @@ apt-get -s install python-psycopg2 python-numpy python-pip
 sudo pip install pupynere
 
 sudo su postgres
+createdb template_postgis
+createlang plpgsql template_postgis
 psql -d template_postgis -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
 psql -d template_postgis -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 psql -d template_postgis -f /usr/share/postgresql/9.1/contrib/postgis_comments.sql
@@ -64,6 +66,10 @@ template1=# ALTER USER postgres with encrypted password 'AK@L34pxD9';
 local   all             postgres                                md5
 
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
+local   zen_test        pointyhaired                            md5
+local   zen_test        elbonian                                md5
+local   zen_test        asok                                    md5
+local   zen_test        alice                                   md5
 local   zen             pointyhaired                            md5
 local   zen             elbonian                                md5
 local   zen             asok                                    md5
