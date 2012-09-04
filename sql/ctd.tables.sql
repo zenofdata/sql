@@ -122,7 +122,7 @@ CREATE TABLE ctd.station_flags (
     UNIQUE (id)
     );
 
-CREATE TABLE ctd.data_flags (
+CREATE TABLE ctd.data_flag (
     id                  INTEGER NOT NULL,
     measure		VARCHAR(3),	-- [T, S, T2, O, C]
     ML			SMALLINT, -- Machine Learn evaluation
@@ -155,6 +155,10 @@ CREATE TABLE ctd.data_flags (
           OR measure = 'o' OR measure = 'o2')*/
     );
 -- CREATE TYPE element_type AS ENUM ('t', 's');
+
+ALTER TABLE ctd.data_flag OWNER TO pointyhaired;
+GRANT SELECT ON ctd.data_flag TO ctdusers;
+GRANT INSERT, UPDATE, DELETE ON ctd.data_flag TO alice;
 
 /*
 CREATE TABLE pirata.loaded_files(
