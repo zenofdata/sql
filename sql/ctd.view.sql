@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW ctd.station AS
+CREATE OR REPLACE VIEW ctd.profile AS
     SELECT c.id as cruiseid, c.shiplnk, c.name as cruisename, 
         p.id as profileid, datetime, /*date(datetime) as woce_date, 
 	"time"(datetime) as woce_time, latitude, longitude,*/ location, 
